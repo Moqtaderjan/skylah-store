@@ -115,7 +115,8 @@ img {
 .header-search input,
 .shop-search input,
 .contact-form input,
-.contact-form textarea {
+.contact-form textarea,
+.contact-form select {
   width: 100%;
   border: none;
   outline: none;
@@ -976,6 +977,13 @@ img {
   color: #655a6f;
 }
 
+.field-hint {
+  margin-top: -6px;
+  font-size: 0.85rem;
+  color: #6c6074;
+  line-height: 1.4;
+}
+
 .checkout-checkbox {
   display: flex;
   gap: 10px;
@@ -1072,6 +1080,188 @@ img {
   padding-left: 20px;
   display: grid;
   gap: 6px;
+}
+
+.account-section {
+  max-width: 1200px;
+}
+
+.account-dashboard {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 20px;
+}
+
+.account-sidebar {
+  background: linear-gradient(180deg, #ffffff, #f8f3fb);
+  border: 1px solid #eadfe8;
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 12px 28px rgba(94, 71, 139, 0.12);
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.account-profile-glass {
+  border-radius: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.13));
+  border: 1px solid rgba(102, 126, 234, 0.26);
+  display: grid;
+  gap: 8px;
+}
+
+.account-avatar-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-avatar {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.22);
+}
+
+.account-avatar-fallback {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-tabs {
+  display: grid;
+  gap: 8px;
+}
+
+.account-tab-btn {
+  border: 1px solid #e8ddea;
+  border-radius: 12px;
+  background: #fff;
+  color: #443a50;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.28s ease;
+}
+
+.account-tab-btn:hover {
+  transform: translateY(-1px);
+  border-color: #667eea;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.16);
+}
+
+.account-tab-btn.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border-color: transparent;
+}
+
+.account-tab-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.auth-inline-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.account-content-panel {
+  background: #fff;
+  border: 1px solid #eadfe8;
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 14px 34px rgba(17, 24, 39, 0.08);
+  animation: fadeInUp 0.4s ease;
+}
+
+.account-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.account-stat-card {
+  border-radius: 14px;
+  border: 1px solid #eadfe8;
+  padding: 14px;
+  background: linear-gradient(135deg, #fff, #faf7fc);
+}
+
+.account-stat-card h4 {
+  margin-bottom: 6px;
+  color: #4c4256;
+}
+
+.account-amazon-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.account-amazon-card {
+  border: 1px solid #eadfe8;
+  border-radius: 14px;
+  padding: 12px;
+  background: #fcfaff;
+}
+
+.account-list {
+  margin-top: 10px;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.account-list li {
+  border: 1px solid #eadfe8;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fbf7fc;
+}
+
+.account-payment-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.account-payment-list li {
+  border: 1px solid #eadfe8;
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-payment-list p {
+  color: #665b72;
+  font-size: 0.92rem;
+}
+
+.compact-form {
+  margin-top: 10px;
 }
 
 .product-details {
@@ -2439,7 +2629,8 @@ img {
   }
 
   .contact-form input,
-  .contact-form textarea {
+  .contact-form textarea,
+  .contact-form select {
     padding: 12px;
     font-size: 14px;
   }
@@ -2450,6 +2641,20 @@ img {
 
   .checkout-inline-fields {
     grid-template-columns: 1fr;
+  }
+
+  .account-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .account-dashboard-grid,
+  .account-amazon-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-payment-list li {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .hero-card {
