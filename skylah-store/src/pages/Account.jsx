@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
   reload,
@@ -10,9 +10,10 @@ import {
 } from 'firebase/auth';
 import { CreditCard, History, Package, Settings, Store, UserCircle2 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
-import { auth } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
 import { isSafeHttpUrl, sanitizeAuthError } from '../lib/security';
 import { getPasswordRequirements, PASSWORD_RULE } from '../lib/authPolicy';
+import { getDefaultAccountData, loadAccountData, saveAccountData } from '../lib/accountDataStore';
 
 const getScopedKey = (uid, key) => `skylah-${key}-${uid}`;
 const RESET_COOLDOWN_SECONDS = 60;
@@ -37,6 +38,7 @@ export default function Account() {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
   const [activityHistory, setActivityHistory] = useState([]);
+  const hasHydratedAccountRef = useRef(false);
 
   const tabs = useMemo(
     () => [
@@ -97,21 +99,56 @@ export default function Account() {
     const savedOrders = localStorage.getItem(ordersKey);
     const savedHistory = localStorage.getItem(historyKey);
 
-    setProfile(
-      savedProfile
-        ? JSON.parse(savedProfile)
-        : {
-            displayName: user.name || '',
-            email: user.email || '',
-            phone: '',
-            photoURL: user.photoURL || '',
-          }
-    );
-    setPaymentMethods(savedPayments ? JSON.parse(savedPayments) : []);
-    setOrderHistory(savedOrders ? JSON.parse(savedOrders) : []);
-    setActivityHistory(savedHistory ? JSON.parse(savedHistory) : []);
-    setActiveTab('overview');
+    const fallbackData = {
+      ...getDefaultAccountData(user),
+      profile: savedProfile ? JSON.parse(savedProfile) : getDefaultAccountData(user).profile,
+      paymentMethods: savedPayments ? JSON.parse(savedPayments) : [],
+      orderHistory: savedOrders ? JSON.parse(savedOrders) : [],
+      activityHistory: savedHistory ? JSON.parse(savedHistory) : [],
+    };
+
+    let isMounted = true;
+
+    const hydrate = async () => {
+      const remoteData = await loadAccountData(user.uid, user);
+
+      if (!isMounted) return;
+
+      const nextData = remoteData || fallbackData;
+
+      setProfile(nextData.profile);
+      setPaymentMethods(nextData.paymentMethods);
+      setOrderHistory(nextData.orderHistory);
+      setActivityHistory(nextData.activityHistory);
+      setActiveTab('overview');
+      hasHydratedAccountRef.current = true;
+
+      if (!remoteData && db) {
+        await saveAccountData(user.uid, nextData);
+      }
+    };
+
+    hydrate();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user?.uid, user?.email, user?.name, user?.photoURL, isEmailVerified]);
+
+  useEffect(() => {
+    if (!db || !user?.uid || !isEmailVerified || !hasHydratedAccountRef.current) return;
+
+    const timeout = window.setTimeout(() => {
+      saveAccountData(user.uid, {
+        profile,
+        paymentMethods,
+        orderHistory,
+        activityHistory,
+      });
+    }, 1200);
+
+    return () => window.clearTimeout(timeout);
+  }, [profile, paymentMethods, orderHistory, activityHistory, user?.uid, isEmailVerified]);
 
   useEffect(() => {
     if (!user?.uid || !isEmailVerified) return;

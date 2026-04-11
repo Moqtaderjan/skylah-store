@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { useStore } from '../context/StoreContext';
+import { sendContactMessage } from '../lib/contactService';
 
 const INITIAL_FORM = {
   name: '',
   email: '',
   subject: '',
-  message: ''
+  message: '',
+  website: ''
 };
 
 const CONTACT_FORM_COOLDOWN_SECONDS = 60;
 const CONTACT_DAILY_LIMIT = 10;
 const CONTACT_LIMIT_STORAGE_KEY = 'skylah-contact-send-limits-v1';
-const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT || 'https://formsubmit.co/ajax/info@skylah.us';
 
 function getTodayKey() {
   const now = new Date();
@@ -94,28 +95,16 @@ export default function Contact() {
     setStatus({ type: '', message: '' });
 
     try {
-      const response = await fetch(CONTACT_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-        body: JSON.stringify({
+      await sendContactMessage(
+        {
           name: formData.name,
           email: formData.email,
           subject: formData.subject,
           message: formData.message,
-          _subject: `Skylah Store Contact: ${formData.subject}`,
-          _captcha: 'true',
-          _template: 'table'
-        })
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || result.success !== 'true') {
-        throw new Error('Unable to send message.');
-      }
+          website: formData.website,
+        },
+        user?.uid
+      );
 
       setStatus({
         type: 'success',
@@ -142,6 +131,16 @@ export default function Contact() {
       </div>
 
       <form className="contact-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="website"
+          value={formData.website}
+          onChange={handleChange}
+          tabIndex="-1"
+          autoComplete="off"
+          aria-hidden="true"
+          style={{ display: 'none' }}
+        />
         <input
           type="text"
           name="name"
