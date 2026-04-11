@@ -984,6 +984,152 @@ img {
   line-height: 1.4;
 }
 
+.auth-form {
+  display: grid;
+  gap: 12px;
+}
+
+.password-guidance {
+  display: grid;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.auth-message {
+  display: none;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+  color: #4f4360;
+  line-height: 1.6;
+}
+
+.auth-message.visible {
+  display: block;
+}
+
+.password-checklist {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid #eadfe8;
+  background: #fcfaff;
+}
+
+.password-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.92rem;
+  color: #5a4d67;
+}
+
+.password-check-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex: 0 0 auto;
+}
+
+.password-check.passed .password-check-icon {
+  background: rgba(34, 122, 77, 0.14);
+  color: #227a4d;
+}
+
+.password-check.missing .password-check-icon {
+  background: rgba(177, 59, 75, 0.12);
+  color: #b13b4b;
+}
+
+.password-check.passed {
+  color: #227a4d;
+}
+
+.password-check.missing {
+  color: #7c6070;
+}
+
+.verify-page {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.verify-shell {
+  width: min(760px, 100%);
+  display: grid;
+  gap: 16px;
+  position: relative;
+}
+
+.verify-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(102, 126, 234, 0.12);
+  color: #4c3e73;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.verify-card {
+  background: linear-gradient(180deg, #ffffff, #faf7fd);
+  border: 1px solid #e8ddea;
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 18px 40px rgba(102, 126, 234, 0.12);
+  text-align: center;
+  display: grid;
+  gap: 16px;
+  animation: fadeInUp 0.45s ease;
+}
+
+.verify-icon-wrap {
+  width: 92px;
+  height: 92px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+  color: #6a45b3;
+}
+
+.verify-card h2 {
+  font-size: 2rem;
+}
+
+.verify-card p {
+  color: #5e5468;
+  line-height: 1.7;
+}
+
+.verify-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #5f3ca4;
+  font-weight: 600;
+}
+
+.verify-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .checkout-checkbox {
   display: flex;
   gap: 10px;

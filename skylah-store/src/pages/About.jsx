@@ -11,16 +11,16 @@ export default function About() {
                 <div className="stat-label">Founded</div>
               </div>
               <div className="stat-item animate-bounce" style={{animationDelay: '0.2s'}}>
-                <div className="stat-number">50K+</div>
-                <div className="stat-label">Happy Customers</div>
+                <div className="stat-number">1K+</div>
+                <div className="stat-label">Orders Fulfilled</div>
               </div>
               <div className="stat-item animate-bounce" style={{animationDelay: '0.4s'}}>
-                <div className="stat-number">100+</div>
-                <div className="stat-label">Products</div>
+                <div className="stat-number">50+</div>
+                <div className="stat-label">Curated Products</div>
               </div>
               <div className="stat-item animate-bounce" style={{animationDelay: '0.6s'}}>
-                <div className="stat-number">24/7</div>
-                <div className="stat-label">Support</div>
+                <div className="stat-number">Fast</div>
+                <div className="stat-label">Responsive Support</div>
               </div>
             </div>
             <h1 className="about-title animate-in">
@@ -44,28 +44,28 @@ export default function About() {
                 <div className="timeline-dot"></div>
                 <div className="timeline-content">
                   <h3>2023: The Beginning</h3>
-                  <p>Founded with a vision to provide unparalleled quality and service in the consumer electronics and lifestyle market.</p>
+                  <p>Founded with a focus on dependable service, careful product selection, and a better buying experience.</p>
                 </div>
               </div>
               <div className="timeline-item animate-slide-up" style={{animationDelay: '0.2s'}}>
                 <div className="timeline-dot"></div>
                 <div className="timeline-content">
                   <h3>Amazon FBA Partnership</h3>
-                  <p>Strategic partnership with Amazon Fulfillment by Amazon, enabling lightning-fast worldwide shipping and premium logistics.</p>
+                  <p>Fulfillment support helps us keep shipping organized, fast, and consistent for every order.</p>
                 </div>
               </div>
               <div className="timeline-item animate-slide-up" style={{animationDelay: '0.4s'}}>
                 <div className="timeline-dot"></div>
                 <div className="timeline-content">
                   <h3>Global Expansion</h3>
-                  <p>Expanded operations across multiple continents, establishing warehouses and partnerships worldwide.</p>
+                  <p>Expanded our reach through trusted suppliers and a growing customer base across regions.</p>
                 </div>
               </div>
               <div className="timeline-item animate-slide-up" style={{animationDelay: '0.6s'}}>
                 <div className="timeline-dot"></div>
                 <div className="timeline-content">
                   <h3>Industry Leadership</h3>
-                  <p>Recognized as a trusted wholesale and retail partner, serving thousands of customers and suppliers globally.</p>
+                  <p>Built a reliable retail presence with steady growth, repeat customers, and dependable service.</p>
                 </div>
               </div>
             </div>
@@ -87,11 +87,11 @@ export default function About() {
               </div>
               <div className="orbiting-support" style={{animationDelay: '4.8s'}}>
                 <div className="orbit-icon">🛠️</div>
-                <div className="orbit-label">24/7 Support</div>
+                <div className="orbit-label">Responsive Support</div>
               </div>
               <div className="orbiting-growth" style={{animationDelay: '6.4s'}}>
                 <div className="orbit-icon">📈</div>
-                <div className="orbit-label">Global Growth</div>
+                <div className="orbit-label">Steady Growth</div>
               </div>
             </div>
           </div>
@@ -177,20 +177,20 @@ export default function About() {
         <div className="container section">
           <div className="stats-showcase">
             <div className="stat-metric animate-in">
-              <div className="metric-number">$2M+</div>
-              <div className="metric-label">Annual Revenue</div>
+              <div className="metric-number">1K+</div>
+              <div className="metric-label">Orders Fulfilled</div>
             </div>
             <div className="stat-metric animate-in" style={{animationDelay: '0.2s'}}>
-              <div className="metric-number">150+</div>
-              <div className="metric-label">Supplier Partners</div>
+              <div className="metric-number">20+</div>
+              <div className="metric-label">Trusted Suppliers</div>
             </div>
             <div className="stat-metric animate-in" style={{animationDelay: '0.4s'}}>
-              <div className="metric-number">99.8%</div>
-              <div className="metric-label">Customer Satisfaction</div>
+              <div className="metric-number">4.8/5</div>
+              <div className="metric-label">Customer Rating</div>
             </div>
             <div className="stat-metric animate-in" style={{animationDelay: '0.6s'}}>
-              <div className="metric-number">48hrs</div>
-              <div className="metric-label">Average Delivery</div>
+              <div className="metric-number">2-5d</div>
+              <div className="metric-label">Typical Delivery</div>
             </div>
           </div>
         </div>

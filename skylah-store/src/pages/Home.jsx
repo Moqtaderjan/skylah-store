@@ -57,16 +57,16 @@ export default function Home() {
 
           <div className="promo-stats">
             <div>
-              <strong>25K+</strong>
-              <span>businesses supplied</span>
+              <strong>1K+</strong>
+              <span>orders fulfilled</span>
             </div>
             <div>
-              <strong>15M+</strong>
-              <span>products shipped globally</span>
+              <strong>50+</strong>
+              <span>curated products</span>
             </div>
             <div>
-              <strong>4.9/5</strong>
-              <span>average partner rating</span>
+              <strong>4.8/5</strong>
+              <span>average rating</span>
             </div>
           </div>
         </div>

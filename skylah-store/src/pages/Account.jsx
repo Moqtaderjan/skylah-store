@@ -13,7 +13,7 @@ import { useStore } from '../context/StoreContext';
 import { auth } from '../lib/firebase';
 
 const getScopedKey = (uid, key) => `skylah-${key}-${uid}`;
-const PASSWORD_RULE = /^(?=.*\d)(?=.*[^\w\s]).{6,}$/;
+const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]).{6,4042}$/;
 
 export default function Account() {
   const { user, authLoading, authConfigured } = useStore();
@@ -24,6 +24,7 @@ export default function Account() {
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [profile, setProfile] = useState({ displayName: '', email: '', phone: '', photoURL: '' });
   const [paymentDraft, setPaymentDraft] = useState({ brand: 'Visa', label: '', last4: '' });
@@ -43,12 +44,37 @@ export default function Account() {
     []
   );
 
+  const passwordRequirements = useMemo(
+    () => [
+      { key: 'length', label: 'At least 6 characters', passed: password.length >= 6 },
+      { key: 'letter', label: 'Includes a letter (A-Z)', passed: /[A-Za-z]/.test(password) },
+      { key: 'number', label: 'Includes a number (0-9)', passed: /\d/.test(password) },
+      { key: 'special', label: 'Includes a special character', passed: /[^\w\s]/.test(password) },
+    ],
+    [password]
+  );
+
+  const missingPasswordRequirements = passwordRequirements
+    .filter((requirement) => !requirement.passed)
+    .map((requirement) => requirement.label);
+
+  const passwordHelpMessage =
+    isSignUp && password.length > 0 && missingPasswordRequirements.length > 0
+      ? `Password must include: ${missingPasswordRequirements.join(', ')}.`
+      : '';
+
   useEffect(() => {
-    setIsEmailVerified(Boolean(user?.emailVerified));
+    if (!user?.emailVerified) {
+      setIsEmailVerified(false);
+      return;
+    }
+
+    setIsEmailVerified(true);
+    setPendingVerificationEmail('');
   }, [user?.emailVerified]);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!user?.uid || !isEmailVerified) return;
 
     const profileKey = getScopedKey(user.uid, 'profile');
     const paymentsKey = getScopedKey(user.uid, 'payments');
@@ -74,27 +100,35 @@ export default function Account() {
     setOrderHistory(savedOrders ? JSON.parse(savedOrders) : []);
     setActivityHistory(savedHistory ? JSON.parse(savedHistory) : []);
     setActiveTab('overview');
-  }, [user?.uid, user?.email, user?.name, user?.photoURL]);
+  }, [user?.uid, user?.email, user?.name, user?.photoURL, isEmailVerified]);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!user?.uid || !isEmailVerified) return;
     localStorage.setItem(getScopedKey(user.uid, 'profile'), JSON.stringify(profile));
-  }, [profile, user?.uid]);
+  }, [profile, user?.uid, isEmailVerified]);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!user?.uid || !isEmailVerified) return;
     localStorage.setItem(getScopedKey(user.uid, 'payments'), JSON.stringify(paymentMethods));
-  }, [paymentMethods, user?.uid]);
+  }, [paymentMethods, user?.uid, isEmailVerified]);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!user?.uid || !isEmailVerified) return;
     localStorage.setItem(getScopedKey(user.uid, 'orders'), JSON.stringify(orderHistory));
-  }, [orderHistory, user?.uid]);
+  }, [orderHistory, user?.uid, isEmailVerified]);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!user?.uid || !isEmailVerified) return;
     localStorage.setItem(getScopedKey(user.uid, 'history'), JSON.stringify(activityHistory));
-  }, [activityHistory, user?.uid]);
+  }, [activityHistory, user?.uid, isEmailVerified]);
+
+  useEffect(() => {
+    if (user?.uid && user.email && !user.emailVerified) {
+      setPendingVerificationEmail(user.email);
+      setStatus('Please verify your email before entering the account dashboard.');
+      signOut(auth).catch(() => {});
+    }
+  }, [user?.uid, user?.email, user?.emailVerified]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -105,7 +139,7 @@ export default function Account() {
     }
 
     if (isSignUp && !PASSWORD_RULE.test(password)) {
-      setStatus('Password must be at least 6 characters and include at least one number and one special character.');
+      setStatus(`Password must include: ${missingPasswordRequirements.join(', ')}.`);
       return;
     }
 
@@ -118,16 +152,19 @@ export default function Account() {
         if (name.trim()) {
           await updateProfile(credential.user, { displayName: name.trim() });
         }
-        await sendEmailVerification(credential.user);
-        setStatus('Account created. Verification email sent. Please verify your email before using full account features.');
-        setActivityHistory((prev) => [
-          { id: crypto.randomUUID(), title: 'Account created', time: new Date().toLocaleString() },
-          ...prev,
-        ]);
+        await sendEmailVerification(credential.user, {
+          url: `${window.location.origin}/verify-email`,
+          handleCodeInApp: true,
+        });
+        setPendingVerificationEmail(email.trim());
+        await signOut(auth);
+        setStatus('Verification email sent. Please verify your email before signing in.');
       } else {
         const result = await signInWithEmailAndPassword(auth, email.trim(), password);
         if (!result.user.emailVerified) {
-          setStatus('Signed in. Please verify your email to unlock full account access.');
+          setPendingVerificationEmail(result.user.email || email.trim());
+          await signOut(auth);
+          setStatus('Please verify your email before signing in. Your account is locked until verification is complete.');
         } else {
           setStatus('Signed in successfully.');
         }
@@ -164,7 +201,10 @@ export default function Account() {
     if (!auth?.currentUser) return;
 
     try {
-      await sendEmailVerification(auth.currentUser);
+      await sendEmailVerification(auth.currentUser, {
+        url: `${window.location.origin}/verify-email`,
+        handleCodeInApp: true,
+      });
       setStatus('A new verification email has been sent.');
     } catch (error) {
       setStatus(error.message || 'Unable to send verification email.');
@@ -180,6 +220,7 @@ export default function Account() {
       setIsEmailVerified(verified);
 
       if (verified) {
+        setPendingVerificationEmail('');
         setStatus('Email verified successfully. Full account access unlocked.');
       } else {
         setStatus('Email is still unverified. Please verify from inbox, then check again.');
@@ -238,6 +279,8 @@ export default function Account() {
     setPaymentMethods((prev) => prev.filter((method) => method.id !== id));
   };
 
+  const showVerifiedDashboard = Boolean(user?.uid && isEmailVerified);
+
   return (
     <section className="container section account-section">
       <div className="section-head">
@@ -255,7 +298,7 @@ export default function Account() {
         <div className="legal-card">
           <p>Loading account session...</p>
         </div>
-      ) : user ? (
+      ) : showVerifiedDashboard ? (
         <div className="account-dashboard animate-in">
           <aside className="account-sidebar">
             <div className="account-profile-glass">
@@ -279,7 +322,6 @@ export default function Account() {
                   type="button"
                   className={`account-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
                   onClick={() => setActiveTab(tab.id)}
-                  disabled={!isEmailVerified}
                 >
                   {tab.icon}
                   <span>{tab.label}</span>
@@ -291,26 +333,7 @@ export default function Account() {
           </aside>
 
           <div className="account-content-panel">
-            {!isEmailVerified && (
-              <>
-                <div className="checkout-alert" role="alert">
-                  <strong>Email Verification Required:</strong> Verify your email to unlock all account features.
-                  <div className="auth-inline-actions">
-                    <button type="button" className="btn btn-primary" onClick={handleSendVerificationEmail}>Resend Verification Email</button>
-                    <button type="button" className="btn btn-secondary" onClick={handleRefreshVerification}>I Verified, Check Again</button>
-                  </div>
-                </div>
-                <div className="legal-card">
-                  <h3>Verification Pending</h3>
-                  <p>
-                    For security, account modules are locked until your email is verified.
-                    After verifying from your inbox, click "I Verified, Check Again".
-                  </p>
-                </div>
-              </>
-            )}
-
-            {isEmailVerified && activeTab === 'overview' && (
+            {activeTab === 'overview' && (
               <div className="account-dashboard-grid">
                 <article className="account-stat-card">
                   <h4>Account ID</h4>
@@ -331,7 +354,7 @@ export default function Account() {
               </div>
             )}
 
-            {isEmailVerified && activeTab === 'orders' && (
+            {activeTab === 'orders' && (
               <div className="legal-card">
                 <h3>Orders</h3>
                 {orderHistory.length === 0 ? (
@@ -346,7 +369,7 @@ export default function Account() {
               </div>
             )}
 
-            {isEmailVerified && activeTab === 'amazon' && (
+            {activeTab === 'amazon' && (
               <div className="legal-card">
                 <h3>Amazon Channel</h3>
                 <p>Marketplace integration status for this account profile.</p>
@@ -367,7 +390,7 @@ export default function Account() {
               </div>
             )}
 
-            {isEmailVerified && activeTab === 'history' && (
+            {activeTab === 'history' && (
               <div className="legal-card">
                 <h3>Account History</h3>
                 {activityHistory.length === 0 ? (
@@ -382,7 +405,7 @@ export default function Account() {
               </div>
             )}
 
-            {isEmailVerified && activeTab === 'payments' && (
+            {activeTab === 'payments' && (
               <div className="legal-card">
                 <h3>Payment Methods</h3>
                 <p>Store only non-sensitive labels for now. Do not store full card data.</p>
@@ -435,7 +458,7 @@ export default function Account() {
               </div>
             )}
 
-            {isEmailVerified && activeTab === 'settings' && (
+            {activeTab === 'settings' && (
               <form className="contact-form" onSubmit={handleProfileSave}>
                 <h3>Account Settings</h3>
                 <input
@@ -471,8 +494,35 @@ export default function Account() {
             {status && <p className="checkout-status" role="status">{status}</p>}
           </div>
         </div>
+      ) : pendingVerificationEmail ? (
+        <div className="legal-card">
+          <h3>Verify Your Email</h3>
+          <p>
+            We sent a verification email to <strong>{pendingVerificationEmail}</strong>. Please verify your email before signing in.
+          </p>
+          <div className="auth-inline-actions">
+            <button type="button" className="btn btn-primary" onClick={handleSendVerificationEmail}>
+              Resend Verification Email
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={handleRefreshVerification}>
+              I Verified, Check Again
+            </button>
+          </div>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={{ marginTop: '12px' }}
+            onClick={() => {
+              setPendingVerificationEmail('');
+              setStatus('');
+            }}
+          >
+            Back to Sign In
+          </button>
+          {status && <p className="checkout-status" role="status">{status}</p>}
+        </div>
       ) : (
-        <form className="contact-form" onSubmit={handleSubmit}>
+        <form className="contact-form auth-form" noValidate onSubmit={handleSubmit}>
           {isSignUp && (
             <input
               type="text"
@@ -496,14 +546,28 @@ export default function Account() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete={isSignUp ? 'new-password' : 'current-password'}
-            minLength={6}
             required
           />
+
           {isSignUp && (
-            <p className="field-hint">
-              Password must be at least 6 characters and include one number and one special character.
-            </p>
+            <div className="password-guidance">
+              <div className={`auth-message ${passwordHelpMessage || status ? 'visible' : ''}`} role="status" aria-live="polite">
+                {status || passwordHelpMessage || 'Your password must match all requirements before you create an account.'}
+              </div>
+              <div className="password-checklist" aria-label="Password requirements">
+                {passwordRequirements.map((requirement) => (
+                  <div
+                    key={requirement.key}
+                    className={`password-check ${requirement.passed ? 'passed' : 'missing'}`}
+                  >
+                    <span className="password-check-icon">{requirement.passed ? '✓' : '✕'}</span>
+                    <span>{requirement.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
+
           <button type="submit" className="btn btn-primary" disabled={isSubmitting || !authConfigured}>
             {isSubmitting ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
@@ -523,7 +587,6 @@ export default function Account() {
               Forgot Password
             </button>
           )}
-          {status && <p className="checkout-status" role="status">{status}</p>}
         </form>
       )}
     </section>
