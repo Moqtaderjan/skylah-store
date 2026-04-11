@@ -1,111 +1,214 @@
 export default function About() {
   return (
-    <section className="container section">
-      <div className="section-head">
-        <h2>About Skylah LLC - Your Trusted Wholesale & Retail Partner</h2>
-        <p>Leading provider of premium consumer electronics, fashion, home goods, and lifestyle products since 2023</p>
-      </div>
-
-      <div className="about-grid">
-        <div className="info-card">
-          <h3>🏢 Our Company</h3>
-          <p>
-            Skylah LLC is a premier wholesale and retail distribution company specializing in high-quality consumer products.
-            With extensive experience in the e-commerce industry, we have established ourselves as a reliable partner for
-            suppliers and retailers worldwide. Our commitment to excellence, fast shipping, and superior customer service
-            has made us a trusted name in the industry.
-          </p>
-          <p>
-            Founded in 2023, Skylah LLC has rapidly grown to become a leading force in the wholesale distribution market,
-            serving customers across multiple continents with our comprehensive product portfolio and professional service standards.
-          </p>
+    <div className="about-page">
+      {/* Hero Section */}
+      <section className="about-hero">
+        <div className="container section">
+          <div className="about-hero-content">
+            <div className="hero-stats">
+              <div className="stat-item animate-bounce">
+                <div className="stat-number">2023</div>
+                <div className="stat-label">Founded</div>
+              </div>
+              <div className="stat-item animate-bounce" style={{animationDelay: '0.2s'}}>
+                <div className="stat-number">50K+</div>
+                <div className="stat-label">Happy Customers</div>
+              </div>
+              <div className="stat-item animate-bounce" style={{animationDelay: '0.4s'}}>
+                <div className="stat-number">100+</div>
+                <div className="stat-label">Products</div>
+              </div>
+              <div className="stat-item animate-bounce" style={{animationDelay: '0.6s'}}>
+                <div className="stat-number">24/7</div>
+                <div className="stat-label">Support</div>
+              </div>
+            </div>
+            <h1 className="about-title animate-in">
+              Crafting Excellence in <span className="gradient-text">Every Product</span>
+            </h1>
+            <p className="about-subtitle animate-slide-up">
+              From humble beginnings to industry leadership, Skylah LLC has revolutionized
+              the way people shop for premium products worldwide.
+            </p>
+          </div>
         </div>
+      </section>
 
-        <div className="info-card">
-          <h3>🚚 Fast & Reliable Shipping</h3>
-          <p>
-            We leverage Amazon FBA (Fulfillment by Amazon) and our extensive warehouse network to ensure lightning-fast
-            delivery to customers worldwide. Our strategic partnerships with major carriers and logistics providers
-            guarantee that your orders arrive on time, every time. With warehouses strategically located across the
-            United States, we can ship to any location with unmatched speed and reliability.
-          </p>
+      {/* Story Section */}
+      <section className="story-section container section">
+        <div className="story-grid">
+          <div className="story-content">
+            <h2 className="section-title animate-in">Our Journey</h2>
+            <div className="story-timeline">
+              <div className="timeline-item animate-slide-up">
+                <div className="timeline-dot"></div>
+                <div className="timeline-content">
+                  <h3>2023: The Beginning</h3>
+                  <p>Founded with a vision to provide unparalleled quality and service in the consumer electronics and lifestyle market.</p>
+                </div>
+              </div>
+              <div className="timeline-item animate-slide-up" style={{animationDelay: '0.2s'}}>
+                <div className="timeline-dot"></div>
+                <div className="timeline-content">
+                  <h3>Amazon FBA Partnership</h3>
+                  <p>Strategic partnership with Amazon Fulfillment by Amazon, enabling lightning-fast worldwide shipping and premium logistics.</p>
+                </div>
+              </div>
+              <div className="timeline-item animate-slide-up" style={{animationDelay: '0.4s'}}>
+                <div className="timeline-dot"></div>
+                <div className="timeline-content">
+                  <h3>Global Expansion</h3>
+                  <p>Expanded operations across multiple continents, establishing warehouses and partnerships worldwide.</p>
+                </div>
+              </div>
+              <div className="timeline-item animate-slide-up" style={{animationDelay: '0.6s'}}>
+                <div className="timeline-dot"></div>
+                <div className="timeline-content">
+                  <h3>Industry Leadership</h3>
+                  <p>Recognized as a trusted wholesale and retail partner, serving thousands of customers and suppliers globally.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="story-visual">
+            <div className="futuristic-visual">
+              <div className="central-globe">🌍</div>
+              <div className="orbiting-shipping" style={{animationDelay: '0s'}}>
+                <div className="orbit-icon">🚚</div>
+                <div className="orbit-label">Fast Shipping</div>
+              </div>
+              <div className="orbiting-quality" style={{animationDelay: '1.6s'}}>
+                <div className="orbit-icon">⭐</div>
+                <div className="orbit-label">Quality First</div>
+              </div>
+              <div className="orbiting-innovation" style={{animationDelay: '3.2s'}}>
+                <div className="orbit-icon">🚀</div>
+                <div className="orbit-label">Innovation</div>
+              </div>
+              <div className="orbiting-support" style={{animationDelay: '4.8s'}}>
+                <div className="orbit-icon">🛠️</div>
+                <div className="orbit-label">24/7 Support</div>
+              </div>
+              <div className="orbiting-growth" style={{animationDelay: '6.4s'}}>
+                <div className="orbit-icon">📈</div>
+                <div className="orbit-label">Global Growth</div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="info-card">
-          <h3>⭐ Quality Assurance</h3>
-          <p>
-            Every product in our catalog undergoes rigorous quality control and testing before reaching our customers.
-            We work exclusively with certified manufacturers and suppliers who meet our stringent standards for quality,
-            safety, and reliability. Our quality assurance team ensures that only the best products make it to our shelves,
-            giving our customers confidence in every purchase they make.
-          </p>
+      {/* Values Section */}
+      <section className="values-section">
+        <div className="container section">
+          <h2 className="section-title text-center animate-in">Our Core Values</h2>
+          <div className="values-grid">
+            <div className="value-card animate-in">
+              <div className="value-icon">🎯</div>
+              <h3>Excellence</h3>
+              <p>We strive for perfection in every product, service, and interaction. Quality is never compromised.</p>
+            </div>
+            <div className="value-card animate-in" style={{animationDelay: '0.2s'}}>
+              <div className="value-icon">🤝</div>
+              <h3>Partnership</h3>
+              <p>Building lasting relationships with suppliers, customers, and partners based on trust and mutual success.</p>
+            </div>
+            <div className="value-card animate-in" style={{animationDelay: '0.4s'}}>
+              <div className="value-icon">🚀</div>
+              <h3>Innovation</h3>
+              <p>Constantly evolving and adapting to bring the latest technology and trends to our customers.</p>
+            </div>
+            <div className="value-card animate-in" style={{animationDelay: '0.6s'}}>
+              <div className="value-icon">💚</div>
+              <h3>Integrity</h3>
+              <p>Honest, transparent, and ethical business practices in everything we do.</p>
+            </div>
+            <div className="value-card animate-in" style={{animationDelay: '0.8s'}}>
+              <div className="value-icon">🌟</div>
+              <h3>Customer Focus</h3>
+              <p>Every decision we make is centered around delivering exceptional value to our customers.</p>
+            </div>
+            <div className="value-card animate-in" style={{animationDelay: '1s'}}>
+              <div className="value-icon">🌍</div>
+              <h3>Global Impact</h3>
+              <p>Making a positive difference in communities worldwide through sustainable and responsible business.</p>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="info-card">
-          <h3>💼 Wholesale Partnership</h3>
-          <p>
-            We are actively seeking reliable suppliers and manufacturers to expand our product offerings. Our established
-            customer base, proven sales channels, and professional operations make us an ideal wholesale partner.
-            We offer competitive terms, timely payments, and dedicated account management to ensure mutually beneficial
-            business relationships. Contact us to discuss partnership opportunities.
-          </p>
+      {/* Team Section */}
+      <section className="team-section container section">
+        <h2 className="section-title text-center animate-in">Meet Our Leadership</h2>
+        <div className="team-grid">
+          <div className="team-member animate-in">
+            <div className="member-avatar">
+              <div className="avatar-placeholder">👨‍💼</div>
+            </div>
+            <h3>Executive Leadership</h3>
+            <p>Experienced professionals with decades of combined expertise in retail, wholesale, and e-commerce operations.</p>
+          </div>
+          <div className="team-member animate-in" style={{animationDelay: '0.2s'}}>
+            <div className="member-avatar">
+              <div className="avatar-placeholder">👩‍💻</div>
+            </div>
+            <h3>Technology Team</h3>
+            <p>Innovative developers and designers creating cutting-edge solutions for seamless shopping experiences.</p>
+          </div>
+          <div className="team-member animate-in" style={{animationDelay: '0.4s'}}>
+            <div className="member-avatar">
+              <div className="avatar-placeholder">📦</div>
+            </div>
+            <h3>Operations Team</h3>
+            <p>Dedicated logistics and fulfillment experts ensuring perfect order processing and delivery.</p>
+          </div>
+          <div className="team-member animate-in" style={{animationDelay: '0.6s'}}>
+            <div className="member-avatar">
+              <div className="avatar-placeholder">🎯</div>
+            </div>
+            <h3>Quality Assurance</h3>
+            <p>Meticulous inspectors maintaining the highest standards across all our products and services.</p>
+          </div>
         </div>
+      </section>
 
-        <div className="info-card">
-          <h3>📈 Our Experience</h3>
-          <p>
-            With years of experience in retail and wholesale distribution, Skylah LLC has built a reputation for excellence
-            in the industry. Our team of professionals brings extensive knowledge in product sourcing, quality control,
-            logistics, and customer service. We have successfully managed thousands of transactions and built lasting
-            relationships with suppliers and customers across the globe.
-          </p>
+      {/* Stats Section */}
+      <section className="stats-section">
+        <div className="container section">
+          <div className="stats-showcase">
+            <div className="stat-metric animate-in">
+              <div className="metric-number">$2M+</div>
+              <div className="metric-label">Annual Revenue</div>
+            </div>
+            <div className="stat-metric animate-in" style={{animationDelay: '0.2s'}}>
+              <div className="metric-number">150+</div>
+              <div className="metric-label">Supplier Partners</div>
+            </div>
+            <div className="stat-metric animate-in" style={{animationDelay: '0.4s'}}>
+              <div className="metric-number">99.8%</div>
+              <div className="metric-label">Customer Satisfaction</div>
+            </div>
+            <div className="stat-metric animate-in" style={{animationDelay: '0.6s'}}>
+              <div className="metric-number">48hrs</div>
+              <div className="metric-label">Average Delivery</div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="info-card">
-          <h3>🌍 Global Reach</h3>
-          <p>
-            While headquartered in Seattle, Washington, our operations extend across multiple locations including
-            Alexandria, Virginia, and strategic partnerships worldwide. This global presence allows us to serve
-            international markets effectively while maintaining the highest standards of service and quality.
-            Our multilingual support team ensures seamless communication with partners worldwide.
-          </p>
+      {/* Call to Action */}
+      <section className="cta-section">
+        <div className="container section">
+          <div className="cta-content animate-in">
+            <h2>Ready to Partner With Us?</h2>
+            <p>Join thousands of satisfied customers and suppliers who trust Skylah LLC for their business needs.</p>
+            <div className="cta-buttons">
+              <a href="/contact" className="btn btn-primary animate-pulse">Contact Us</a>
+              <a href="/shop" className="btn btn-secondary">Explore Products</a>
+            </div>
+          </div>
         </div>
-
-        <div className="info-card">
-          <h3>🛡️ Customer Commitment</h3>
-          <p>
-            Customer satisfaction is at the heart of everything we do. We pride ourselves on our responsive customer
-            service, with dedicated support available 24/7 to address any concerns or questions. Our commitment to
-            excellence extends beyond the sale, ensuring that every customer has a positive experience with our products
-            and services. This dedication has earned us a loyal customer base and numerous positive reviews.
-          </p>
-        </div>
-
-        <div className="info-card">
-          <h3>🔧 Technology & Innovation</h3>
-          <p>
-            We invest heavily in cutting-edge technology to streamline our operations and enhance the customer experience.
-            Our advanced e-commerce platform, automated inventory management, and data-driven insights allow us to
-            provide exceptional service while maintaining competitive pricing. We continuously adapt to industry trends
-            and technological advancements to stay ahead of the competition.
-          </p>
-        </div>
-      </div>
-
-      <div className="contact-cta">
-        <h3>Ready to Partner With Us?</h3>
-        <p>
-          Whether you're a supplier looking to expand your distribution network or a retailer seeking reliable wholesale
-          partners, Skylah LLC is here to help you succeed. Contact our team today to discuss partnership opportunities
-          and discover how we can grow your business together.
-        </p>
-        <div className="contact-info">
-          <p><strong>Email:</strong> info@skylah.us</p>
-          <p><strong>Phone:</strong> +1 (971) 303-8521</p>
-          <p><strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM PST</p>
-          <p><strong>Location:</strong> Seattle, WA, USA</p>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

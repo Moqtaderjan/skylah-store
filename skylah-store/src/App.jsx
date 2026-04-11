@@ -6,6 +6,9 @@ import Shop from './pages/Shop';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Account from './pages/Account';
+import Checkout from './pages/Checkout';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import ProductDetails from './pages/ProductDetails';
 import CartDrawer from './components/CartDrawer';
 import { useStore } from './context/StoreContext';
@@ -23,6 +26,9 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           <Route path="/product/:id" element={<ProductDetails />} />
         </Routes>
       </main>

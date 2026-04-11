@@ -1,7 +1,9 @@
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 
 export default function CartDrawer() {
+  const navigate = useNavigate();
   const {
     cart,
     setCartOpen,
@@ -52,7 +54,15 @@ export default function CartDrawer() {
 
         <div className="cart-footer">
           <h3>Total: ${cartTotal.toFixed(2)}</h3>
-          <button className="btn btn-primary full-btn">Checkout</button>
+          <button
+            className="btn btn-primary full-btn"
+            onClick={() => {
+              setCartOpen(false);
+              navigate('/checkout');
+            }}
+          >
+            Checkout
+          </button>
           <button className="btn btn-secondary full-btn" onClick={clearCart}>Clear Cart</button>
         </div>
       </aside>
