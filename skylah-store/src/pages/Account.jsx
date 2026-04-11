@@ -11,9 +11,10 @@ import {
 import { CreditCard, History, Package, Settings, Store, UserCircle2 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { auth } from '../lib/firebase';
+import { isSafeHttpUrl, sanitizeAuthError } from '../lib/security';
+import { getPasswordRequirements, PASSWORD_RULE } from '../lib/authPolicy';
 
 const getScopedKey = (uid, key) => `skylah-${key}-${uid}`;
-const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]).{6,}$/;
 const RESET_COOLDOWN_SECONDS = 60;
 const VERIFICATION_COOLDOWN_SECONDS = 60;
 
@@ -49,15 +50,7 @@ export default function Account() {
     []
   );
 
-  const passwordRequirements = useMemo(
-    () => [
-      { key: 'length', label: 'At least 6 characters', passed: password.length >= 6 },
-      { key: 'letter', label: 'Includes a letter (A-Z)', passed: /[A-Za-z]/.test(password) },
-      { key: 'number', label: 'Includes a number (0-9)', passed: /\d/.test(password) },
-      { key: 'special', label: 'Includes a special character', passed: /[^\w\s]/.test(password) },
-    ],
-    [password]
-  );
+  const passwordRequirements = useMemo(() => getPasswordRequirements(password), [password]);
 
   const missingPasswordRequirements = passwordRequirements
     .filter((requirement) => !requirement.passed)
@@ -192,7 +185,7 @@ export default function Account() {
 
       setPassword('');
     } catch (error) {
-      setStatus(error.message || 'Authentication failed.');
+      setStatus(sanitizeAuthError(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -221,7 +214,7 @@ export default function Account() {
       setNowTs(Date.now());
       setStatus(`Password reset email sent to ${normalizedEmail}. Check your inbox and spam folder.`);
     } catch (error) {
-      setStatus(error.message || 'Unable to send password reset email.');
+      setStatus(sanitizeAuthError(error));
     }
   };
 
@@ -246,7 +239,7 @@ export default function Account() {
       setNowTs(Date.now());
       setStatus(`Verification email sent to ${currentEmail}. Use the email link to verify, then click "I Verified, Check Again".`);
     } catch (error) {
-      setStatus(error.message || 'Unable to send verification email.');
+      setStatus(sanitizeAuthError(error));
     }
   };
 
@@ -265,7 +258,7 @@ export default function Account() {
         setStatus('Email is still unverified. Please verify from inbox, then check again.');
       }
     } catch (error) {
-      setStatus(error.message || 'Unable to refresh verification status.');
+      setStatus(sanitizeAuthError(error));
     }
   };
 
@@ -282,9 +275,15 @@ export default function Account() {
     e.preventDefault();
     if (!auth?.currentUser) return;
 
+    const photoUrl = profile.photoURL.trim();
+    if (photoUrl && !isSafeHttpUrl(photoUrl)) {
+      setStatus('Profile image URL must start with http:// or https://.');
+      return;
+    }
+
     await updateProfile(auth.currentUser, {
       displayName: profile.displayName,
-      photoURL: profile.photoURL,
+      photoURL: photoUrl,
     });
 
     setStatus('Profile settings updated.');
@@ -343,7 +342,13 @@ export default function Account() {
             <div className="account-profile-glass">
               <div className="account-avatar-wrap">
                 {profile.photoURL ? (
-                  <img src={profile.photoURL} alt="Profile" className="account-avatar" />
+                  isSafeHttpUrl(profile.photoURL) ? (
+                    <img src={profile.photoURL} alt="Profile" className="account-avatar" />
+                  ) : (
+                    <div className="account-avatar account-avatar-fallback">
+                      {(profile.displayName || user.email || 'U').slice(0, 1).toUpperCase()}
+                    </div>
+                  )
                 ) : (
                   <div className="account-avatar account-avatar-fallback">
                     {(profile.displayName || user.email || 'U').slice(0, 1).toUpperCase()}

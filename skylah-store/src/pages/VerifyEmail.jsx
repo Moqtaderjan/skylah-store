@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { applyActionCode } from 'firebase/auth';
 import { CheckCircle2, MailCheck, ShieldCheck, Sparkles } from 'lucide-react';
 import { auth } from '../lib/firebase';
+import { isLikelyFirebaseOobCode, sanitizeAuthError } from '../lib/security';
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
@@ -15,13 +16,13 @@ export default function VerifyEmail() {
 
   const title = useMemo(() => {
     if (isSuccess) return 'Email Verified';
-    if (!oobCode || mode !== 'verifyEmail') return 'Verification Link';
+    if (!oobCode || !isLikelyFirebaseOobCode(oobCode) || mode !== 'verifyEmail') return 'Verification Link';
     return 'Verifying Email';
   }, [isSuccess, mode, oobCode]);
 
   useEffect(() => {
     const verify = async () => {
-      if (!oobCode || mode !== 'verifyEmail') {
+      if (!oobCode || !isLikelyFirebaseOobCode(oobCode) || mode !== 'verifyEmail') {
         setIsLoading(false);
         setStatus('This verification link is missing or invalid. Please request a new verification email from your account page.');
         return;
@@ -32,7 +33,7 @@ export default function VerifyEmail() {
         setIsSuccess(true);
         setStatus('Your email has been verified successfully. You can now return to your account and sign in.');
       } catch (error) {
-        setStatus(error.message || 'We could not verify this email link. It may be expired or already used.');
+        setStatus(sanitizeAuthError(error));
       } finally {
         setIsLoading(false);
       }
