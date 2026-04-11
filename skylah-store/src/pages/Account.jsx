@@ -13,7 +13,9 @@ import { useStore } from '../context/StoreContext';
 import { auth } from '../lib/firebase';
 
 const getScopedKey = (uid, key) => `skylah-${key}-${uid}`;
-const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]).{6,4042}$/;
+const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]).{6,}$/;
+const RESET_COOLDOWN_SECONDS = 60;
+const VERIFICATION_COOLDOWN_SECONDS = 60;
 
 export default function Account() {
   const { user, authLoading, authConfigured } = useStore();
@@ -25,6 +27,9 @@ export default function Account() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState('');
+  const [passwordResetCooldownUntil, setPasswordResetCooldownUntil] = useState(0);
+  const [verificationCooldownUntil, setVerificationCooldownUntil] = useState(0);
+  const [nowTs, setNowTs] = useState(Date.now());
   const [activeTab, setActiveTab] = useState('overview');
   const [profile, setProfile] = useState({ displayName: '', email: '', phone: '', photoURL: '' });
   const [paymentDraft, setPaymentDraft] = useState({ brand: 'Visa', label: '', last4: '' });
@@ -63,6 +68,9 @@ export default function Account() {
       ? `Password must include: ${missingPasswordRequirements.join(', ')}.`
       : '';
 
+  const passwordResetSecondsLeft = Math.max(0, Math.ceil((passwordResetCooldownUntil - nowTs) / 1000));
+  const verificationSecondsLeft = Math.max(0, Math.ceil((verificationCooldownUntil - nowTs) / 1000));
+
   useEffect(() => {
     if (!user?.emailVerified) {
       setIsEmailVerified(false);
@@ -72,6 +80,16 @@ export default function Account() {
     setIsEmailVerified(true);
     setPendingVerificationEmail('');
   }, [user?.emailVerified]);
+
+  useEffect(() => {
+    if (passwordResetSecondsLeft <= 0 && verificationSecondsLeft <= 0) return;
+
+    const timer = window.setInterval(() => {
+      setNowTs(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [passwordResetSecondsLeft, verificationSecondsLeft]);
 
   useEffect(() => {
     if (!user?.uid || !isEmailVerified) return;
@@ -157,8 +175,10 @@ export default function Account() {
           handleCodeInApp: true,
         });
         setPendingVerificationEmail(email.trim());
+        setVerificationCooldownUntil(Date.now() + VERIFICATION_COOLDOWN_SECONDS * 1000);
+        setNowTs(Date.now());
         await signOut(auth);
-        setStatus('Verification email sent. Please verify your email before signing in.');
+        setStatus(`Verification email sent to ${email.trim()}. Please verify your email before signing in.`);
       } else {
         const result = await signInWithEmailAndPassword(auth, email.trim(), password);
         if (!result.user.emailVerified) {
@@ -189,23 +209,42 @@ export default function Account() {
       return;
     }
 
+    if (passwordResetSecondsLeft > 0) {
+      setStatus(`Please wait ${passwordResetSecondsLeft}s before sending another password reset email.`);
+      return;
+    }
+
     try {
-      await sendPasswordResetEmail(auth, email.trim());
-      setStatus('Password reset email sent. Check your inbox.');
+      const normalizedEmail = email.trim();
+      await sendPasswordResetEmail(auth, normalizedEmail);
+      setPasswordResetCooldownUntil(Date.now() + RESET_COOLDOWN_SECONDS * 1000);
+      setNowTs(Date.now());
+      setStatus(`Password reset email sent to ${normalizedEmail}. Check your inbox and spam folder.`);
     } catch (error) {
       setStatus(error.message || 'Unable to send password reset email.');
     }
   };
 
   const handleSendVerificationEmail = async () => {
-    if (!auth?.currentUser) return;
+    if (!auth?.currentUser) {
+      setStatus('Sign in first to resend a verification email.');
+      return;
+    }
+
+    if (verificationSecondsLeft > 0) {
+      setStatus(`Please wait ${verificationSecondsLeft}s before resending verification.`);
+      return;
+    }
 
     try {
       await sendEmailVerification(auth.currentUser, {
         url: `${window.location.origin}/verify-email`,
         handleCodeInApp: true,
       });
-      setStatus('A new verification email has been sent.');
+      const currentEmail = auth.currentUser.email || pendingVerificationEmail;
+      setVerificationCooldownUntil(Date.now() + VERIFICATION_COOLDOWN_SECONDS * 1000);
+      setNowTs(Date.now());
+      setStatus(`Verification email sent to ${currentEmail}. Use the email link to verify, then click "I Verified, Check Again".`);
     } catch (error) {
       setStatus(error.message || 'Unable to send verification email.');
     }
@@ -501,8 +540,13 @@ export default function Account() {
             We sent a verification email to <strong>{pendingVerificationEmail}</strong>. Please verify your email before signing in.
           </p>
           <div className="auth-inline-actions">
-            <button type="button" className="btn btn-primary" onClick={handleSendVerificationEmail}>
-              Resend Verification Email
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleSendVerificationEmail}
+              disabled={verificationSecondsLeft > 0}
+            >
+              {verificationSecondsLeft > 0 ? `Resend in ${verificationSecondsLeft}s` : 'Resend Verification Email'}
             </button>
             <button type="button" className="btn btn-secondary" onClick={handleRefreshVerification}>
               I Verified, Check Again
@@ -549,11 +593,12 @@ export default function Account() {
             required
           />
 
+          <div className={`auth-message ${passwordHelpMessage || status ? 'visible' : ''}`} role="status" aria-live="polite">
+            {status || passwordHelpMessage || ' '}
+          </div>
+
           {isSignUp && (
             <div className="password-guidance">
-              <div className={`auth-message ${passwordHelpMessage || status ? 'visible' : ''}`} role="status" aria-live="polite">
-                {status || passwordHelpMessage || 'Your password must match all requirements before you create an account.'}
-              </div>
               <div className="password-checklist" aria-label="Password requirements">
                 {passwordRequirements.map((requirement) => (
                   <div
@@ -583,8 +628,13 @@ export default function Account() {
             {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Create one'}
           </button>
           {!isSignUp && (
-            <button type="button" className="btn btn-secondary" onClick={handleForgotPassword}>
-              Forgot Password
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleForgotPassword}
+              disabled={passwordResetSecondsLeft > 0}
+            >
+              {passwordResetSecondsLeft > 0 ? `Forgot Password (${passwordResetSecondsLeft}s)` : 'Forgot Password'}
             </button>
           )}
         </form>
